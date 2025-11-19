@@ -133,6 +133,9 @@ export default function AlunoDetalhesPage() {
   }
 
   
+  if (!aluno) {
+    return null
+  }
 
   const chartData = historico
     .map((h) => ({
@@ -180,14 +183,18 @@ export default function AlunoDetalhesPage() {
               <Calendar className="h-5 w-5 text-slate-400" />
               <div>
                 <p className="text-xs text-slate-400">Início do Treino</p>
-                <p className="text-white">{new Date(aluno.data_inicio_treino).toLocaleDateString("pt-BR")}</p>
+                <p className="text-white">
+                  {aluno.data_inicio_treino
+                    ? new Date(aluno.data_inicio_treino).toLocaleDateString("pt-BR")
+                    : "—"}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Target className="h-5 w-5 text-slate-400" />
               <div>
                 <p className="text-xs text-slate-400">Idade</p>
-                <p className="text-white">{aluno.idade}</p>
+                <p className="text-white">{typeof aluno.idade === "number" ? aluno.idade : "—"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -219,29 +226,21 @@ export default function AlunoDetalhesPage() {
               <Ruler className="h-5 w-5 text-green-400" />
               <div>
                 <p className="text-xs text-slate-400">Altura</p>
-                <p className="text-2xl font-bold text-white">{aluno.altura_cm} cm</p>
+                <p className="text-2xl font-bold text-white">
+                  {typeof aluno.altura_cm === "number" ? `${aluno.altura_cm} cm` : "—"}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Target className="h-5 w-5 text-blue-400" />
               <div>
                 <p className="text-xs text-slate-400">Frequência Semanal</p>
-                <p className="text-2xl font-bold text-white">{aluno.frequencia_semana}x</p>
+                <p className="text-2xl font-bold text-white">
+                  {typeof aluno.frequencia_semana === "number" ? `${aluno.frequencia_semana}x` : "—"}
+                </p>
               </div>
             </div>
           </CardContent>
-          </Card>
-
-          <Card className="bg-slate-900/50 border-slate-800">
-            <CardHeader>
-              <CardTitle className="text-white">Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <div className={`h-3 w-3 rounded-full ${aluno.ativo ? "bg-green-500" : "bg-red-500"}`} />
-                <span className="text-white">{aluno.ativo ? "Ativo" : "Inativo"}</span>
-              </div>
-            </CardContent>
           </Card>
         </div>
       </div>

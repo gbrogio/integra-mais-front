@@ -5,9 +5,9 @@ const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === "true"
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   }
 
   if (token) {
