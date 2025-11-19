@@ -1,0 +1,1106 @@
+openapi: 3.0.3
+info:
+  title: Integra Mais API
+  description: |
+    Sistema de Gerenciamento de Treinos e Progresso para Personal Trainers
+    
+    ## Visão Geral
+    O Integra Mais é uma API RESTful desenvolvida para personal trainers gerenciarem seus alunos, 
+    treinos, progressões de carga e pagamentos. O sistema oferece:
+    
+    - Gestão completa de alunos e seus dados
+    - Histórico de peso e medidas corporais
+    - Criação e gerenciamento de treinos e exercícios
+    - Progressão automática de cargas (linear e dupla)
+    - Controle de planos e pagamentos
+    - Auditoria completa de alterações
+    
+    ## Autenticação
+    Todos os endpoints (exceto registro e login) requerem autenticação via Bearer Token (JWT).
+    
+    Para obter um token:
+    1. Registre-se em `/auth/register`
+    2. Faça login em `/auth/token` (use email como username)
+    3. Use o token retornado no header: `Authorization: Bearer {token}`
+    
+  version: 1.0.0
+  contact:
+    name: Integra Mais Support
+    email: support@integramais.com
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.integramais.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: Registro e autenticação de personal trainers
+  - name: Alunos
+    description: Gestão de alunos
+  - name: Histórico de Peso
+    description: Registro e consulta de histórico de peso
+  - name: Planos
+    description: Gestão de planos de pagamento
+  - name: Pagamentos
+    description: Registro e consulta de pagamentos
+  - name: Treinos
+    description: Gestão de treinos
+  - name: Exercícios
+    description: Gestão de exercícios dentro de treinos
+  - name: Progressão
+    description: Configuração de regras de progressão de carga
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Personal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PersonalCreate:
+      type: object
+      required:
+        - nome
+        - email
+        - password
+      properties:
+        nome:
+          type: string
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          example: "joao@personal.com"
+        password:
+          type: string
+          format: password
+          example: "senhaSegura123"
+
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: "bearer"
+
+    Aluno:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        personal_id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        altura_cm:
+          type: number
+          format: decimal
+        idade:
+          type: integer
+        restricoes:
+          type: string
+        data_inicio_treino:
+          type: string
+          format: date
+        frequencia_semana:
+          type: integer
+          minimum: 1
+          maximum: 7
+        plano_id:
+          type: string
+          format: uuid
+        plano_data_inicio:
+          type: string
+          format: date
+        plano_data_vencimento:
+          type: string
+          format: date
+        forma_pagamento:
+          type: string
+          enum: [pix, credito, debito]
+        data_pagamento:
+          type: string
+          format: date
+        observacoes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AlunoCreate:
+      type: object
+      required:
+        - nome
+      properties:
+        nome:
+          type: string
+          example: "João Silva"
+        altura_cm:
+          type: number
+          format: decimal
+          example: 178
+        idade:
+          type: integer
+          example: 28
+        restricoes:
+          type: string
+          example: "Nenhuma"
+        data_inicio_treino:
+          type: string
+          format: date
+          example: "2025-09-01"
+        frequencia_semana:
+          type: integer
+          example: 3
+        plano_id:
+          type: string
+          format: uuid
+        plano_data_inicio:
+          type: string
+          format: date
+          example: "2025-09-01"
+        forma_pagamento:
+          type: string
+          enum: [pix, credito, debito]
+          example: "pix"
+        data_pagamento:
+          type: string
+          format: date
+          example: "2025-09-01"
+        observacoes:
+          type: string
+          example: "Aluno novo"
+
+    WeightRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        aluno_id:
+          type: string
+          format: uuid
+        data:
+          type: string
+          format: date
+        peso_kg:
+          type: number
+          format: decimal
+        percentual_gordura:
+          type: number
+          format: decimal
+        observacao:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    WeightRecordCreate:
+      type: object
+      required:
+        - peso_kg
+      properties:
+        peso_kg:
+          type: number
+          format: decimal
+          example: 75.4
+        percentual_gordura:
+          type: number
+          format: decimal
+          example: 14.8
+        observacao:
+          type: string
+          example: "Progresso positivo após o novo plano alimentar"
+
+    Plano:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        duracao_meses:
+          type: integer
+        preco:
+          type: number
+          format: decimal
+        descricao:
+          type: string
+
+    PlanoCreate:
+      type: object
+      required:
+        - nome
+        - duracao_meses
+        - preco
+      properties:
+        nome:
+          type: string
+          example: "Mensal"
+        duracao_meses:
+          type: integer
+          example: 1
+        preco:
+          type: number
+          format: decimal
+          example: 150.00
+        descricao:
+          type: string
+          example: "Plano mensal com renovação automática"
+
+    Pagamento:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        aluno_id:
+          type: string
+          format: uuid
+        plano_id:
+          type: string
+          format: uuid
+        valor:
+          type: number
+          format: decimal
+        forma_pagamento:
+          type: string
+          enum: [pix, credito, debito]
+        data_pagamento:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [pago, pendente, atrasado]
+        transacao_id:
+          type: string
+
+    PagamentoCreate:
+      type: object
+      required:
+        - plano_id
+        - valor
+        - forma_pagamento
+        - data_pagamento
+      properties:
+        plano_id:
+          type: string
+          format: uuid
+        valor:
+          type: number
+          format: decimal
+          example: 150.00
+        forma_pagamento:
+          type: string
+          enum: [pix, credito, debito]
+          example: "pix"
+        data_pagamento:
+          type: string
+          format: date
+          example: "2025-10-06"
+        status:
+          type: string
+          enum: [pago, pendente, atrasado]
+          default: "pago"
+        transacao_id:
+          type: string
+
+    Treino:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        aluno_id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        descricao:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TreinoCreate:
+      type: object
+      required:
+        - nome
+        - aluno_id
+      properties:
+        nome:
+          type: string
+          example: "Treino A - Peito e Tríceps"
+        descricao:
+          type: string
+          example: "Foco em hipertrofia para membros superiores"
+        aluno_id:
+          type: string
+          format: uuid
+
+    Exercicio:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        treino_id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+        series:
+          type: integer
+        repeticoes:
+          type: string
+        tempo_descanso_seg:
+          type: integer
+        observacoes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    ExercicioCreate:
+      type: object
+      required:
+        - nome
+        - series
+        - repeticoes
+      properties:
+        nome:
+          type: string
+          example: "Supino Reto com Barra"
+        series:
+          type: integer
+          example: 4
+        repeticoes:
+          type: string
+          example: "8-12"
+        tempo_descanso_seg:
+          type: integer
+          example: 60
+        observacoes:
+          type: string
+          example: "Manter a cadência controlada"
+
+    RegraProgressao:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        exercicio_plano_id:
+          type: string
+          format: uuid
+        tipo_progressao:
+          type: string
+          enum: [linear, dupla]
+        incremento_kg:
+          type: number
+          format: decimal
+        meta_reps_min:
+          type: integer
+        meta_reps_max:
+          type: integer
+        observacoes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RegraProgressaoCreate:
+      type: object
+      required:
+        - tipo_progressao
+      properties:
+        tipo_progressao:
+          type: string
+          enum: [linear, dupla]
+          example: "linear"
+        incremento_kg:
+          type: number
+          format: decimal
+          example: 2.5
+        meta_reps_min:
+          type: integer
+          example: 8
+        meta_reps_max:
+          type: integer
+          example: 12
+        observacoes:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Registrar novo personal trainer
+      description: Cria uma conta para um novo personal trainer no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalCreate'
+      responses:
+        '201':
+          description: Personal registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Personal'
+        '409':
+          description: Email já cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Login e obter token JWT
+      description: Autentica um personal trainer e retorna um token de acesso
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: Email do personal
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/alunos:
+    get:
+      tags:
+        - Alunos
+      summary: Listar todos os alunos
+      description: Retorna a lista de alunos do personal autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de alunos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aluno'
+        '401':
+          description: Não autenticado
+
+    post:
+      tags:
+        - Alunos
+      summary: Criar novo aluno
+      description: Cria um novo aluno vinculado ao personal autenticado
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlunoCreate'
+      responses:
+        '201':
+          description: Aluno criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aluno'
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL do recurso criado
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: plano_id não encontrado
+
+  /api/alunos/{aluno_id}:
+    get:
+      tags:
+        - Alunos
+      summary: Obter detalhes de um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalhes do aluno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aluno'
+        '404':
+          description: Aluno não encontrado
+
+    put:
+      tags:
+        - Alunos
+      summary: Atualizar dados de um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlunoCreate'
+      responses:
+        '200':
+          description: Aluno atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aluno'
+        '404':
+          description: Aluno não encontrado
+
+    delete:
+      tags:
+        - Alunos
+      summary: Excluir um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Aluno excluído com sucesso
+        '404':
+          description: Aluno não encontrado
+
+  /api/alunos/{aluno_id}/historico-peso:
+    get:
+      tags:
+        - Histórico de Peso
+      summary: Listar histórico de peso de um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de registros de peso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightRecord'
+        '404':
+          description: Aluno não encontrado
+
+    post:
+      tags:
+        - Histórico de Peso
+      summary: Adicionar registro de peso
+      description: Cria um novo registro de peso para um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightRecordCreate'
+      responses:
+        '201':
+          description: Registro criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightRecord'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Aluno não encontrado
+
+  /api/planos:
+    get:
+      tags:
+        - Planos
+      summary: Listar todos os planos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de planos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plano'
+
+    post:
+      tags:
+        - Planos
+      summary: Criar novo plano
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanoCreate'
+      responses:
+        '201':
+          description: Plano criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+        '409':
+          description: Nome do plano já existe
+
+  /api/planos/{plano_id}:
+    get:
+      tags:
+        - Planos
+      summary: Obter detalhes de um plano
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plano_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalhes do plano
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+        '404':
+          description: Plano não encontrado
+
+    put:
+      tags:
+        - Planos
+      summary: Atualizar um plano
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plano_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanoCreate'
+      responses:
+        '200':
+          description: Plano atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+
+    delete:
+      tags:
+        - Planos
+      summary: Excluir um plano
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plano_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Plano excluído
+        '409':
+          description: Plano vinculado a alunos
+
+  /api/alunos/{aluno_id}/pagamentos:
+    get:
+      tags:
+        - Pagamentos
+      summary: Listar pagamentos de um aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de pagamentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pagamento'
+
+    post:
+      tags:
+        - Pagamentos
+      summary: Registrar pagamento
+      description: Registra um novo pagamento e atualiza a data de vencimento do aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PagamentoCreate'
+      responses:
+        '201':
+          description: Pagamento registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pagamento'
+        '404':
+          description: Aluno ou plano não encontrado
+
+  /api/treinos:
+    get:
+      tags:
+        - Treinos
+      summary: Listar treinos
+      description: Lista todos os treinos do personal, opcionalmente filtrados por aluno
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de treinos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Treino'
+
+    post:
+      tags:
+        - Treinos
+      summary: Criar novo treino
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TreinoCreate'
+      responses:
+        '201':
+          description: Treino criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Treino'
+        '403':
+          description: Aluno não pertence ao personal autenticado
+
+  /api/treinos/{treino_id}:
+    get:
+      tags:
+        - Treinos
+      summary: Obter detalhes de um treino
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: treino_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalhes do treino
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Treino'
+        '404':
+          description: Treino não encontrado
+
+  /api/treinos/{treino_id}/exercicios:
+    get:
+      tags:
+        - Exercícios
+      summary: Listar exercícios de um treino
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: treino_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de exercícios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercicio'
+
+    post:
+      tags:
+        - Exercícios
+      summary: Adicionar exercício a um treino
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: treino_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExercicioCreate'
+      responses:
+        '201':
+          description: Exercício adicionado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercicio'
+        '403':
+          description: Treino não pertence ao personal autenticado
+
+  /api/alunos/{aluno_id}/exercicios-plano/{exercicio_plano_id}/regra-progressao:
+    put:
+      tags:
+        - Progressão
+      summary: Definir regra de progressão
+      description: |
+        Cria ou atualiza a regra de progressão de carga para um exercício.
+        
+        **Progressão Linear:** Incrementa a carga em um valor fixo quando o aluno completa todas as repetições.
+        
+        **Dupla Progressão:** Trabalha com uma faixa de repetições (min-max). Ao atingir o máximo, incrementa a carga e volta para o mínimo.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: aluno_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: exercicio_plano_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegraProgressaoCreate'
+            examples:
+              linear:
+                summary: Progressão Linear
+                value:
+                  tipo_progressao: "linear"
+                  incremento_kg: 2.5
+                  observacoes: "Progressão padrão para exercícios compostos"
+              dupla:
+                summary: Dupla Progressão
+                value:
+                  tipo_progressao: "dupla"
+                  incremento_kg: 2.0
+                  meta_reps_min: 8
+                  meta_reps_max: 12
+      responses:
+        '200':
+          description: Regra criada/atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegraProgressao'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Aluno ou exercício não encontrado
+
+  /:
+    get:
+      tags:
+        - Health
+      summary: Root endpoint
+      description: Retorna informações básicas da API
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  version:
+                    type: string
+                  docs:
+                    type: string
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Verifica se a API está funcionando
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+
+
