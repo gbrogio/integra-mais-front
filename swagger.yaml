@@ -1,31 +1,31 @@
 openapi: 3.0.3
 info:
-  title: Integra Mais API
+  title: GestorFit API
   description: |
     Sistema de Gerenciamento de Treinos e Progresso para Personal Trainers
-    
+
     ## Visão Geral
-    O Integra Mais é uma API RESTful desenvolvida para personal trainers gerenciarem seus alunos, 
+    O GestorFit é uma API RESTful desenvolvida para personal trainers gerenciarem seus alunos, 
     treinos, progressões de carga e pagamentos. O sistema oferece:
-    
+
     - Gestão completa de alunos e seus dados
     - Histórico de peso e medidas corporais
     - Criação e gerenciamento de treinos e exercícios
     - Progressão automática de cargas (linear e dupla)
     - Controle de planos e pagamentos
     - Auditoria completa de alterações
-    
+
     ## Autenticação
     Todos os endpoints (exceto registro e login) requerem autenticação via Bearer Token (JWT).
-    
+
     Para obter um token:
     1. Registre-se em `/auth/register`
     2. Faça login em `/auth/token` (use email como username)
     3. Use o token retornado no header: `Authorization: Bearer {token}`
-    
+
   version: 1.0.0
   contact:
-    name: Integra Mais Support
+    name: GestorFit Support
     email: support@integramais.com
 
 servers:
@@ -484,20 +484,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PersonalCreate'
+              $ref: "#/components/schemas/PersonalCreate"
       responses:
-        '201':
+        "201":
           description: Personal registrado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Personal'
-        '409':
+                $ref: "#/components/schemas/Personal"
+        "409":
           description: Email já cadastrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /auth/token:
     post:
@@ -522,18 +522,18 @@ paths:
                   type: string
                   format: password
       responses:
-        '200':
+        "200":
           description: Login bem-sucedido
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Token'
-        '401':
+                $ref: "#/components/schemas/Token"
+        "401":
           description: Credenciais inválidas
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /api/alunos:
     get:
@@ -544,15 +544,15 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Lista de alunos
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Aluno'
-        '401':
+                  $ref: "#/components/schemas/Aluno"
+        "401":
           description: Não autenticado
 
     post:
@@ -567,26 +567,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AlunoCreate'
+              $ref: "#/components/schemas/AlunoCreate"
       responses:
-        '201':
+        "201":
           description: Aluno criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Aluno'
+                $ref: "#/components/schemas/Aluno"
           headers:
             Location:
               schema:
                 type: string
               description: URL do recurso criado
-        '400':
+        "400":
           description: Dados inválidos
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '404':
+                $ref: "#/components/schemas/Error"
+        "404":
           description: plano_id não encontrado
 
   /api/alunos/{aluno_id}:
@@ -604,13 +604,13 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Detalhes do aluno
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Aluno'
-        '404':
+                $ref: "#/components/schemas/Aluno"
+        "404":
           description: Aluno não encontrado
 
     put:
@@ -631,15 +631,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AlunoCreate'
+              $ref: "#/components/schemas/AlunoCreate"
       responses:
-        '200':
+        "200":
           description: Aluno atualizado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Aluno'
-        '404':
+                $ref: "#/components/schemas/Aluno"
+        "404":
           description: Aluno não encontrado
 
     delete:
@@ -656,9 +656,9 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Aluno excluído com sucesso
-        '404':
+        "404":
           description: Aluno não encontrado
 
   /api/alunos/{aluno_id}/historico-peso:
@@ -676,15 +676,15 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Lista de registros de peso
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WeightRecord'
-        '404':
+                  $ref: "#/components/schemas/WeightRecord"
+        "404":
           description: Aluno não encontrado
 
     post:
@@ -706,17 +706,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WeightRecordCreate'
+              $ref: "#/components/schemas/WeightRecordCreate"
       responses:
-        '201':
+        "201":
           description: Registro criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WeightRecord'
-        '400':
+                $ref: "#/components/schemas/WeightRecord"
+        "400":
           description: Dados inválidos
-        '404':
+        "404":
           description: Aluno não encontrado
 
   /api/planos:
@@ -727,14 +727,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Lista de planos
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Plano'
+                  $ref: "#/components/schemas/Plano"
 
     post:
       tags:
@@ -747,15 +747,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlanoCreate'
+              $ref: "#/components/schemas/PlanoCreate"
       responses:
-        '201':
+        "201":
           description: Plano criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Plano'
-        '409':
+                $ref: "#/components/schemas/Plano"
+        "409":
           description: Nome do plano já existe
 
   /api/planos/{plano_id}:
@@ -773,13 +773,13 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Detalhes do plano
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Plano'
-        '404':
+                $ref: "#/components/schemas/Plano"
+        "404":
           description: Plano não encontrado
 
     put:
@@ -800,14 +800,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlanoCreate'
+              $ref: "#/components/schemas/PlanoCreate"
       responses:
-        '200':
+        "200":
           description: Plano atualizado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Plano'
+                $ref: "#/components/schemas/Plano"
 
     delete:
       tags:
@@ -823,9 +823,9 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Plano excluído
-        '409':
+        "409":
           description: Plano vinculado a alunos
 
   /api/alunos/{aluno_id}/pagamentos:
@@ -843,14 +843,14 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Lista de pagamentos
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Pagamento'
+                  $ref: "#/components/schemas/Pagamento"
 
     post:
       tags:
@@ -871,15 +871,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PagamentoCreate'
+              $ref: "#/components/schemas/PagamentoCreate"
       responses:
-        '201':
+        "201":
           description: Pagamento registrado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pagamento'
-        '404':
+                $ref: "#/components/schemas/Pagamento"
+        "404":
           description: Aluno ou plano não encontrado
 
   /api/treinos:
@@ -898,14 +898,14 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Lista de treinos
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Treino'
+                  $ref: "#/components/schemas/Treino"
 
     post:
       tags:
@@ -918,15 +918,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TreinoCreate'
+              $ref: "#/components/schemas/TreinoCreate"
       responses:
-        '201':
+        "201":
           description: Treino criado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Treino'
-        '403':
+                $ref: "#/components/schemas/Treino"
+        "403":
           description: Aluno não pertence ao personal autenticado
 
   /api/treinos/{treino_id}:
@@ -944,13 +944,13 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Detalhes do treino
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Treino'
-        '404':
+                $ref: "#/components/schemas/Treino"
+        "404":
           description: Treino não encontrado
 
   /api/treinos/{treino_id}/exercicios:
@@ -968,14 +968,14 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Lista de exercícios
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Exercicio'
+                  $ref: "#/components/schemas/Exercicio"
 
     post:
       tags:
@@ -995,15 +995,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExercicioCreate'
+              $ref: "#/components/schemas/ExercicioCreate"
       responses:
-        '201':
+        "201":
           description: Exercício adicionado com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Exercicio'
-        '403':
+                $ref: "#/components/schemas/Exercicio"
+        "403":
           description: Treino não pertence ao personal autenticado
 
   /api/alunos/{aluno_id}/exercicios-plano/{exercicio_plano_id}/regra-progressao:
@@ -1013,9 +1013,9 @@ paths:
       summary: Definir regra de progressão
       description: |
         Cria ou atualiza a regra de progressão de carga para um exercício.
-        
+
         **Progressão Linear:** Incrementa a carga em um valor fixo quando o aluno completa todas as repetições.
-        
+
         **Dupla Progressão:** Trabalha com uma faixa de repetições (min-max). Ao atingir o máximo, incrementa a carga e volta para o mínimo.
       security:
         - bearerAuth: []
@@ -1037,7 +1037,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegraProgressaoCreate'
+              $ref: "#/components/schemas/RegraProgressaoCreate"
             examples:
               linear:
                 summary: Progressão Linear
@@ -1053,15 +1053,15 @@ paths:
                   meta_reps_min: 8
                   meta_reps_max: 12
       responses:
-        '200':
+        "200":
           description: Regra criada/atualizada com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RegraProgressao'
-        '400':
+                $ref: "#/components/schemas/RegraProgressao"
+        "400":
           description: Dados inválidos
-        '404':
+        "404":
           description: Aluno ou exercício não encontrado
 
   /:
@@ -1071,7 +1071,7 @@ paths:
       summary: Root endpoint
       description: Retorna informações básicas da API
       responses:
-        '200':
+        "200":
           description: API information
           content:
             application/json:
@@ -1092,7 +1092,7 @@ paths:
       summary: Health check
       description: Verifica se a API está funcionando
       responses:
-        '200':
+        "200":
           description: API is healthy
           content:
             application/json:
@@ -1102,5 +1102,3 @@ paths:
                   status:
                     type: string
                     example: "healthy"
-
-

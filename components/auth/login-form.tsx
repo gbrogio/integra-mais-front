@@ -42,7 +42,6 @@ export function LoginForm() {
         <CardDescription className="text-slate-400">
           Entre com suas credenciais para acessar o sistema
           <br />
-          <span className="text-xs text-blue-400 mt-2 block">Demo: demo@integramais.com / demo123</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
